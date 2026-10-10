@@ -1,6 +1,17 @@
+# Python cache files
 __pycache__/
 *.py[cod]
+
+# Virtual environments
 .venv/
 venv/
+
+# Environment variables
 .env
+
+# Test and coverage files
+.coverage
+htmlcov/
+
+# Local ticket data
 data/tickets.json
