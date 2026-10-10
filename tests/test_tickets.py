@@ -62,12 +62,20 @@ class TestCreateTicket(unittest.TestCase):
         tickets = []
 
         first = create_ticket(
-            "Wi-Fi failure", "Network", "high", 15, tickets
+            "Wi-Fi failure",
+            "Network",
+            "high",
+            15,
+            tickets,
         )
         tickets.append(first)
 
         second = create_ticket(
-            "Broken projector", "Equipment", "medium", 5, tickets
+            "Broken projector",
+            "Equipment",
+            "medium",
+            5,
+            tickets,
         )
         tickets.append(second)
 
@@ -82,6 +90,41 @@ class TestCreateTicket(unittest.TestCase):
         ]
 
         self.assertEqual(generate_ticket_id(tickets), "T003")
+
+    # Five additional tests
+
+    def test_title_must_be_a_string(self):
+        with self.assertRaises(ValueError):
+            create_ticket(123, "Network", "high", 5)
+
+    def test_category_must_be_a_string(self):
+        with self.assertRaises(ValueError):
+            create_ticket("Wi-Fi failure", 123, "high", 5)
+
+    def test_urgency_must_be_a_string(self):
+        with self.assertRaises(ValueError):
+            create_ticket("Wi-Fi failure", "Network", None, 5)
+
+    def test_affected_users_must_be_positive_integer(self):
+        for value in (0, -1, 2.5, True):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    create_ticket(
+                        "Wi-Fi failure",
+                        "Network",
+                        "high",
+                        value,
+                    )
+
+    def test_existing_tickets_must_be_a_list(self):
+        with self.assertRaises(ValueError):
+            create_ticket(
+                "Wi-Fi failure",
+                "Network",
+                "high",
+                5,
+                "not a list",
+            )
 
 
 if __name__ == "__main__":
