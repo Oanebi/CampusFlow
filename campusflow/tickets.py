@@ -1,10 +1,11 @@
+
 def calculate_priority(urgency, affected_users):
     """Calculate a ticket's priority from urgency and affected users."""
 
     if not isinstance(urgency, str):
         raise ValueError("Urgency must be low, medium, or high.")
 
-    urgency = urgency.lower().strip()
+    urgency = urgency.strip().lower()
 
     if urgency not in ("low", "medium", "high"):
         raise ValueError("Urgency must be low, medium, or high.")
@@ -34,7 +35,8 @@ def generate_ticket_id(existing_tickets):
     existing_ids = {
         ticket["id"]
         for ticket in existing_tickets
-        if isinstance(ticket, dict) and isinstance(ticket.get("id"), str)
+        if isinstance(ticket, dict)
+        and isinstance(ticket.get("id"), str)
     }
 
     number = 1
@@ -45,15 +47,13 @@ def generate_ticket_id(existing_tickets):
     return f"T{number:03d}"
 
 
-
 def create_ticket(title, category, urgency, affected_users, existing_tickets=None):
     """Create and return a validated campus helpdesk ticket."""
 
-    # Check that the title is a string and is not empty.
+    # Validate the title.
     if not isinstance(title, str) or not title.strip():
         raise ValueError("Ticket title must be a non-empty string.")
 
-    # Reject titles containing only digits, such as "0001" or "999".
     if title.strip().isdigit():
         raise ValueError("Ticket title must describe a campus problem.")
 
@@ -61,19 +61,33 @@ def create_ticket(title, category, urgency, affected_users, existing_tickets=Non
     if not isinstance(category, str) or not category.strip():
         raise ValueError("Ticket category cannot be empty.")
 
+    allowed_categories = {
+        "network",
+        "hardware",
+        "software",
+        "other",
+    }
+
+    if category.strip().lower() not in allowed_categories:
+        raise ValueError(
+            "Category must be Network, Hardware, Software, or Other."
+        )
+
+    # Validate the existing ticket collection.
     if existing_tickets is None:
         existing_tickets = []
 
     if not isinstance(existing_tickets, list):
         raise ValueError("Existing tickets must be provided as a list.")
 
-    ticket_id = generate_ticket_id(existing_tickets)
+    # Calculate priority and generate an ID only after validation.
     priority = calculate_priority(urgency, affected_users)
+    ticket_id = generate_ticket_id(existing_tickets)
 
     return {
         "id": ticket_id,
         "title": title.strip(),
-        "category": category.strip(),
+        "category": category.strip().title(),
         "urgency": urgency.strip().lower(),
         "affected_users": affected_users,
         "priority": priority,

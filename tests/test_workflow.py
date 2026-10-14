@@ -38,6 +38,11 @@ class TestWorkflow(unittest.TestCase):
         with self.assertRaises(ValueError):
             find_ticket(self.tickets, "T999")
 
+    def test_find_ticket_skips_non_dictionary_entries(self):
+        tickets = [None, "invalid", {"id": "T001"}]
+        ticket = find_ticket(tickets, "T001")
+        self.assertEqual(ticket["id"], "T001")
+
     def test_assign_ticket(self):
         ticket = assign_ticket(self.tickets, "T001", " Ada ")
         self.assertEqual(ticket["assigned_to"], "Ada")
@@ -49,6 +54,15 @@ class TestWorkflow(unittest.TestCase):
     def test_assign_ticket_rejects_unknown_ticket(self):
         with self.assertRaises(ValueError):
             assign_ticket(self.tickets, "T999", "Ada")
+
+    def test_resolved_ticket_cannot_be_assigned(self):
+        self.tickets[0]["status"] = "resolved"
+        self.tickets[0]["assigned_to"] = "Grace"
+
+        with self.assertRaises(ValueError):
+            assign_ticket(self.tickets, "T001", "Ada")
+
+        self.assertEqual(self.tickets[0]["assigned_to"], "Grace")
 
     def test_unassigned_ticket_cannot_start(self):
         with self.assertRaises(ValueError):
@@ -79,14 +93,18 @@ class TestWorkflow(unittest.TestCase):
         self.assertEqual(ticket["status"], "open")
 
     def test_invalid_status_is_rejected(self):
+        original_status = self.tickets[0]["status"]
+
         with self.assertRaises(ValueError):
             update_ticket_status(self.tickets, "T001", "waiting")
 
-    def test_queue_sorts_by_priority(self):
+        self.assertEqual(self.tickets[0]["status"], original_status)
+
+    def test_queue_sorts_open_tickets_by_priority(self):
         tickets = [
             {"id": "T001", "priority": "low", "status": "open"},
             {"id": "T002", "priority": "critical", "status": "open"},
-            {"id": "T003", "priority": "high", "status": "in_progress"},
+            {"id": "T003", "priority": "high", "status": "open"},
             {"id": "T004", "priority": "medium", "status": "open"},
         ]
 
@@ -97,15 +115,16 @@ class TestWorkflow(unittest.TestCase):
             ["T002", "T003", "T004", "T001"],
         )
 
-    def test_queue_excludes_resolved_tickets(self):
+    def test_queue_includes_only_open_tickets(self):
         tickets = [
-            {"id": "T001", "priority": "critical", "status": "resolved"},
-            {"id": "T002", "priority": "low", "status": "open"},
+            {"id": "T001", "priority": "critical", "status": "open"},
+            {"id": "T002", "priority": "high", "status": "in_progress"},
+            {"id": "T003", "priority": "low", "status": "resolved"},
         ]
 
         queue = get_work_queue(tickets)
 
-        self.assertEqual([ticket["id"] for ticket in queue], ["T002"])
+        self.assertEqual([ticket["id"] for ticket in queue], ["T001"])
 
     def test_queue_breaks_priority_ties_numerically(self):
         tickets = [
@@ -120,6 +139,14 @@ class TestWorkflow(unittest.TestCase):
             [ticket["id"] for ticket in queue],
             ["T001", "T002", "T010"],
         )
+
+    def test_empty_open_queue(self):
+        tickets = [
+            {"id": "T001", "priority": "high", "status": "in_progress"},
+            {"id": "T002", "priority": "low", "status": "resolved"},
+        ]
+
+        self.assertEqual(get_work_queue(tickets), [])
 
     def test_list_tickets(self):
         result = list_tickets(self.tickets)

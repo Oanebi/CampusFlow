@@ -3,8 +3,43 @@ import json
 from pathlib import Path
 
 
+def _validate_tickets(tickets, filename):
+    """Validate the ticket collection before loading or saving."""
+
+    if not isinstance(tickets, list):
+        raise ValueError(
+            f"Ticket data in '{filename}' must contain a JSON list."
+        )
+
+    seen_ids = set()
+
+    for index, ticket in enumerate(tickets):
+        if not isinstance(ticket, dict):
+            raise ValueError(
+                f"Ticket at position {index} in '{filename}' "
+                "must be a JSON object."
+            )
+
+        ticket_id = ticket.get("id")
+
+        if not isinstance(ticket_id, str) or not ticket_id.strip():
+            raise ValueError(
+                f"Ticket at position {index} in '{filename}' "
+                "must have a non-empty string ID."
+            )
+
+        if ticket_id in seen_ids:
+            raise ValueError(
+                f"Duplicate ticket ID '{ticket_id}' in '{filename}'."
+            )
+
+        seen_ids.add(ticket_id)
+
+
 def save_tickets(tickets, filename="data/tickets.json"):
-    """Save tickets to a JSON file."""
+    """Validate and save tickets to a JSON file."""
+
+    _validate_tickets(tickets, filename)
 
     path = Path(filename)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -14,7 +49,7 @@ def save_tickets(tickets, filename="data/tickets.json"):
 
 
 def load_tickets(filename="data/tickets.json"):
-    """Load tickets from a JSON file."""
+    """Load and validate tickets from a JSON file."""
 
     path = Path(filename)
 
@@ -29,9 +64,6 @@ def load_tickets(filename="data/tickets.json"):
             f"Ticket data in '{filename}' is invalid JSON."
         ) from error
 
-    if not isinstance(tickets, list):
-        raise ValueError(
-            f"Ticket data in '{filename}' must contain a JSON list."
-        )
+    _validate_tickets(tickets, filename)
 
     return tickets
