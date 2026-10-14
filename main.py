@@ -1,3 +1,4 @@
+
 from campusflow.tickets import create_ticket
 from campusflow.workflow import (
     assign_ticket,
@@ -15,6 +16,14 @@ def display_ticket(ticket):
     print(f"\nTicket ID: {ticket['id']}")
     print(f"Title: {ticket['title']}")
     print(f"Category: {ticket['category']}")
+
+    # Show extra details when the category is Other.
+    if ticket["category"].lower() == "other":
+        print(
+            f"Category details: "
+            f"{ticket.get('category_details', 'Not specified')}"
+        )
+
     print(f"Urgency: {ticket['urgency']}")
     print(f"Affected users: {ticket['affected_users']}")
     print(f"Priority: {ticket['priority']}")
@@ -49,15 +58,10 @@ def main():
         try:
             if choice == "1":
                 title = input("Ticket title: ").strip()
+
                 category = input(
                     "Category (Network, Hardware, Software, Other): "
                 ).strip()
-                urgency = input(
-                    "Urgency (low, medium, high): "
-                ).strip().lower()
-                affected_users = int(
-                    input("Number of affected users: ").strip()
-                )
 
                 allowed_categories = {
                     "network",
@@ -71,16 +75,44 @@ def main():
                         "Category must be Network, Hardware, Software, or Other."
                     )
 
+                category = category.title()
+                category_details = None
+
+                # Ask for more information if the user selects Other.
+                if category == "Other":
+                    category_details = input(
+                        "Please specify the problem category: "
+                    ).strip()
+
+                    while not category_details:
+                        print("Category details cannot be empty.")
+                        category_details = input(
+                            "Please specify the problem category: "
+                        ).strip()
+
+                urgency = input(
+                    "Urgency (low, medium, high): "
+                ).strip().lower()
+
+                affected_users = int(
+                    input("Number of affected users: ").strip()
+                )
+
                 ticket = create_ticket(
                     title,
-                    category.title(),
+                    category,
                     urgency,
                     affected_users,
                     tickets,
                 )
 
+                # Save the additional details on the ticket.
+                if category == "Other":
+                    ticket["category_details"] = category_details
+
                 tickets.append(ticket)
                 save_tickets(tickets)
+
                 print(f"Ticket {ticket['id']} created successfully.")
 
             elif choice == "2":
