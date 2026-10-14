@@ -127,5 +127,35 @@ class TestStorage(unittest.TestCase):
                         load_tickets(filename)
 
 
+    def test_save_and_load_ticket_notes(self):
+        tickets = [
+            {
+                "id": "T001",
+                "title": "Wi-Fi failure",
+                "priority": "high",
+                "status": "open",
+                "notes": [
+                    {
+                        "note_id": "N001",
+                        "author": "Ada",
+                        "message": "Router restarted",
+                    }
+                ],
+            }
+        ]
+
+        with tempfile.TemporaryDirectory() as directory:
+            filename = Path(directory) / "tickets.json"
+
+            save_tickets(tickets, filename)
+            loaded = load_tickets(filename)
+
+            self.assertEqual(loaded, tickets)
+            self.assertEqual(
+                loaded[0]["notes"][0]["note_id"],
+                "N001",
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
