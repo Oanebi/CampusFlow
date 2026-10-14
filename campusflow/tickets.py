@@ -45,12 +45,19 @@ def generate_ticket_id(existing_tickets):
     return f"T{number:03d}"
 
 
+
 def create_ticket(title, category, urgency, affected_users, existing_tickets=None):
     """Create and return a validated campus helpdesk ticket."""
 
+    # Check that the title is a string and is not empty.
     if not isinstance(title, str) or not title.strip():
-        raise ValueError("Ticket title cannot be empty.")
+        raise ValueError("Ticket title must be a non-empty string.")
 
+    # Reject titles containing only digits, such as "0001" or "999".
+    if title.strip().isdigit():
+        raise ValueError("Ticket title must describe a campus problem.")
+
+    # Validate the category.
     if not isinstance(category, str) or not category.strip():
         raise ValueError("Ticket category cannot be empty.")
 
