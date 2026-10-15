@@ -1,4 +1,3 @@
-
 from campusflow.tickets import create_ticket
 from campusflow.workflow import (
     assign_ticket,
@@ -7,17 +6,23 @@ from campusflow.workflow import (
     list_tickets,
     view_ticket,
 )
-from campusflow.reports import generate_report
 from campusflow.storage import load_tickets, save_tickets
+from campusflow.cli_features import (
+    add_note_menu,
+    reports_menu,
+    search_menu,
+    view_notes_menu,
+)
+from campusflow.understanding_check import run_quiz
 
 
 def display_ticket(ticket):
     """Display a ticket's details."""
+
     print(f"\nTicket ID: {ticket['id']}")
     print(f"Title: {ticket['title']}")
     print(f"Category: {ticket['category']}")
 
-    # Show extra details when the category is Other.
     if ticket["category"].lower() == "other":
         print(
             f"Category details: "
@@ -51,9 +56,13 @@ def main():
         print("5. Update ticket status")
         print("6. View work queue")
         print("7. View reports")
-        print("8. Exit")
+        print("8. Search tickets")
+        print("9. Add follow-up note")
+        print("10. View ticket notes")
+        print("11. Engineering understanding check")
+        print("12. Exit")
 
-        choice = input("Choose an option (1-8): ").strip()
+        choice = input("Choose an option (1-12): ").strip()
 
         try:
             if choice == "1":
@@ -78,7 +87,6 @@ def main():
                 category = category.title()
                 category_details = None
 
-                # Ask for more information if the user selects Other.
                 if category == "Other":
                     category_details = input(
                         "Please specify the problem category: "
@@ -106,7 +114,6 @@ def main():
                     tickets,
                 )
 
-                # Save the additional details on the ticket.
                 if category == "Other":
                     ticket["category_details"] = category_details
 
@@ -126,7 +133,9 @@ def main():
 
             elif choice == "3":
                 ticket_id = input("Enter ticket ID: ").strip().upper()
+
                 ticket = view_ticket(tickets, ticket_id)
+
                 display_ticket(ticket)
 
             elif choice == "4":
@@ -135,16 +144,31 @@ def main():
 
                 assign_ticket(tickets, ticket_id, staff_name)
                 save_tickets(tickets)
+
                 print(f"Ticket {ticket_id} assigned successfully.")
 
             elif choice == "5":
                 ticket_id = input("Enter ticket ID: ").strip().upper()
-                print("Available statuses: open, in_progress, resolved")
-                new_status = input("Enter new status: ").strip().lower()
 
-                update_ticket_status(tickets, ticket_id, new_status)
+                print(
+                    "Available statuses: open, in_progress, resolved"
+                )
+
+                new_status = input(
+                    "Enter new status: "
+                ).strip().lower()
+
+                update_ticket_status(
+                    tickets,
+                    ticket_id,
+                    new_status,
+                )
+
                 save_tickets(tickets)
-                print(f"Ticket {ticket_id} status updated to {new_status}.")
+
+                print(
+                    f"Ticket {ticket_id} status updated to {new_status}."
+                )
 
             elif choice == "6":
                 queue = get_work_queue(tickets)
@@ -153,32 +177,37 @@ def main():
                     print("The work queue is empty.")
                 else:
                     print("\n--- Work Queue ---")
+
                     for ticket in queue:
                         display_ticket(ticket)
 
             elif choice == "7":
-                report = generate_report(tickets)
-
-                print("\n--- Ticket Report ---")
-                print(f"Total tickets: {report['total']}")
-
-                print("\nTickets by status:")
-                for status, count in report["by_status"].items():
-                    print(f"  {status}: {count}")
-
-                print("\nTickets by priority:")
-                for priority, count in report["by_priority"].items():
-                    print(f"  {priority}: {count}")
+                reports_menu(tickets)
 
             elif choice == "8":
+                search_menu(tickets)
+
+            elif choice == "9":
+                add_note_menu(tickets, save_tickets)
+
+            elif choice == "10":
+                view_notes_menu(tickets)
+
+            elif choice == "11":
+                run_quiz()
+
+            elif choice == "12":
                 print("Goodbye!")
                 break
 
             else:
-                print("Invalid option. Please choose a number from 1 to 8.")
+                print(
+                    "Invalid option. Please choose a number from 1 to 12."
+                )
 
         except (ValueError, TypeError) as error:
             print(f"Error: {error}")
+
         except OSError as error:
             print(f"File error: Could not save ticket data: {error}")
 
