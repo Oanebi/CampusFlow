@@ -18,6 +18,7 @@ from campusflow.understanding_check import run_quiz
 
 def display_ticket(ticket):
     """Display a ticket's details."""
+
     print(f"\nTicket ID: {ticket['id']}")
     print(f"Title: {ticket['title']}")
     print(f"Category: {ticket['category']}")
@@ -132,7 +133,9 @@ def main():
 
             elif choice == "3":
                 ticket_id = input("Enter ticket ID: ").strip().upper()
+
                 ticket = view_ticket(tickets, ticket_id)
+
                 display_ticket(ticket)
 
             elif choice == "4":
@@ -141,16 +144,31 @@ def main():
 
                 assign_ticket(tickets, ticket_id, staff_name)
                 save_tickets(tickets)
+
                 print(f"Ticket {ticket_id} assigned successfully.")
 
             elif choice == "5":
                 ticket_id = input("Enter ticket ID: ").strip().upper()
-                print("Available statuses: open, in_progress, resolved")
-                new_status = input("Enter new status: ").strip().lower()
 
-                update_ticket_status(tickets, ticket_id, new_status)
+                print(
+                    "Available statuses: open, in_progress, resolved"
+                )
+
+                new_status = input(
+                    "Enter new status: "
+                ).strip().lower()
+
+                update_ticket_status(
+                    tickets,
+                    ticket_id,
+                    new_status,
+                )
+
                 save_tickets(tickets)
-                print(f"Ticket {ticket_id} status updated to {new_status}.")
+
+                print(
+                    f"Ticket {ticket_id} status updated to {new_status}."
+                )
 
             elif choice == "6":
                 queue = get_work_queue(tickets)
@@ -159,6 +177,7 @@ def main():
                     print("The work queue is empty.")
                 else:
                     print("\n--- Work Queue ---")
+
                     for ticket in queue:
                         display_ticket(ticket)
 
@@ -182,10 +201,13 @@ def main():
                 break
 
             else:
-                print("Invalid option. Please choose a number from 1 to 12.")
+                print(
+                    "Invalid option. Please choose a number from 1 to 12."
+                )
 
         except (ValueError, TypeError) as error:
             print(f"Error: {error}")
+
         except OSError as error:
             print(f"File error: Could not save ticket data: {error}")
 

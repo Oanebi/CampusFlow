@@ -16,16 +16,14 @@ def _ask_filter(label, valid_options, input_fn=input, output_fn=print):
         if not answer:
             return None
 
-        answer = answer.casefold()
-
-        if answer in valid_options:
-            return answer
+        for option in valid_options:
+            if answer.casefold() == option.casefold():
+                return option
 
         output_fn(
             f"Invalid {label.lower()}. Choose one of: "
             f"{', '.join(valid_options)}."
         )
-
 
 def search_menu(tickets, input_fn=input, output_fn=print):
     """Search tickets using optional filters."""
@@ -128,7 +126,7 @@ def add_note_menu(tickets, save_fn, input_fn=input, output_fn=print):
     save_fn(tickets)
 
     output_fn(
-        f'Note {note["id"]} added successfully to ticket {ticket_id}.'
+        f'Note {note["note_id"]} added successfully to ticket {ticket_id}.'
     )
 
     return note
@@ -148,7 +146,7 @@ def view_notes_menu(tickets, input_fn=input, output_fn=print):
         return notes
 
     def note_sort_key(note):
-        note_id = str(note.get("id", ""))
+        note_id = str(note.get("note_id", ""))
         digits = "".join(character for character in note_id if character.isdigit())
         return (int(digits) if digits else float("inf"), note_id)
 
@@ -158,7 +156,7 @@ def view_notes_menu(tickets, input_fn=input, output_fn=print):
 
     for note in notes:
         output_fn(
-            f'Note {note.get("id", "Unknown")} | '
+            f'Note {note.get("note_id", "Unknown")} | '
             f'{note.get("author", "Unknown author")} | '
             f'{note.get("message", "")}'
         )
