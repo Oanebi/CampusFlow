@@ -3,7 +3,8 @@ def find_ticket(tickets, ticket_id):
     """Find a ticket by its ID."""
 
     for ticket in tickets:
-        if ticket.get("id") == ticket_id:
+        # Skip invalid entries instead of crashing.
+        if isinstance(ticket, dict) and ticket.get("id") == ticket_id:
             return ticket
 
     raise ValueError(f"Ticket '{ticket_id}' was not found.")
@@ -27,7 +28,7 @@ def assign_ticket(tickets, ticket_id, staff_name):
 
 
 def update_ticket_status(tickets, ticket_id, new_status):
-    """Update ticket status while enforcing workflow rules."""
+    """Update a ticket's status while enforcing workflow rules."""
 
     allowed_statuses = ("open", "in_progress", "resolved")
 
@@ -50,13 +51,14 @@ def update_ticket_status(tickets, ticket_id, new_status):
                     "A ticket must be assigned before moving to in_progress."
                 )
         elif new_status != "open":
-            raise ValueError("An open ticket must move to in_progress first.")
+            raise ValueError(
+                "An open ticket must move to in_progress first."
+            )
 
     elif current_status == "in_progress":
         if new_status not in ("in_progress", "resolved"):
             raise ValueError(
-                "An in-progress ticket can only remain in progress "
-                "or be resolved."
+                "An in-progress ticket can only remain in progress or be resolved."
             )
 
     else:
@@ -67,7 +69,7 @@ def update_ticket_status(tickets, ticket_id, new_status):
 
 
 def get_work_queue(tickets):
-    """Return unresolved tickets sorted by priority and numeric ticket ID."""
+    """Return only open tickets, ordered by priority and ticket ID."""
 
     priority_order = {
         "critical": 0,
@@ -76,14 +78,14 @@ def get_work_queue(tickets):
         "low": 3,
     }
 
-    unresolved_tickets = [
+    open_tickets = [
         ticket
         for ticket in tickets
-        if ticket.get("status") != "resolved"
+        if isinstance(ticket, dict) and ticket.get("status") == "open"
     ]
 
     return sorted(
-        unresolved_tickets,
+        open_tickets,
         key=lambda ticket: (
             priority_order.get(ticket.get("priority"), 4),
             int(ticket["id"][1:]),
@@ -92,12 +94,12 @@ def get_work_queue(tickets):
 
 
 def list_tickets(tickets):
-    """Return all tickets as a list."""
+    """Return a list of tickets."""
 
     return list(tickets)
 
 
 def view_ticket(tickets, ticket_id):
-    """Return the details of a ticket by ID."""
+    """Return one ticket by its ID."""
 
     return find_ticket(tickets, ticket_id)
