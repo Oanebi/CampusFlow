@@ -1,11 +1,15 @@
-
 """Functions for adding and retrieving ticket follow-up notes."""
+
+from copy import deepcopy
 
 from campusflow.workflow import find_ticket
 
 
 def _generate_note_id(notes):
-    """Return the next available note ID for a ticket."""
+    """Validate existing notes and return the next available note ID."""
+
+    if not isinstance(notes, list):
+        raise ValueError("Existing ticket notes must be a list.")
 
     existing_ids = set()
 
@@ -15,7 +19,10 @@ def _generate_note_id(notes):
 
         note_id = note.get("note_id")
 
-        if not isinstance(note_id, str) or not note_id.startswith("N"):
+        if not isinstance(note_id, str):
+            raise ValueError("Existing note ID is invalid.")
+
+        if not note_id.startswith("N"):
             raise ValueError("Existing note ID is invalid.")
 
         number_part = note_id[1:]
@@ -34,6 +41,20 @@ def _generate_note_id(notes):
 
         existing_ids.add(note_id)
 
+        # Validate existing note content too.
+        author = note.get("author")
+        message = note.get("message")
+
+        if not isinstance(author, str) or not author.strip():
+            raise ValueError("Existing note author is invalid.")
+
+        if not isinstance(message, str):
+            raise ValueError("Existing note message is invalid.")
+
+        if not 5 <= len(message.strip()) <= 300:
+            raise ValueError("Existing note message length is invalid.")
+
+    # Find the first available ID without overwriting an existing note.
     number = 1
 
     while f"N{number:03d}" in existing_ids:
@@ -45,6 +66,7 @@ def _generate_note_id(notes):
 def add_note(tickets, ticket_id, author, message):
     """Validate and add a follow-up note to an eligible ticket."""
 
+    # Find the ticket before attempting any changes.
     ticket = find_ticket(tickets, ticket_id)
 
     if not isinstance(author, str) or not author.strip():
@@ -68,10 +90,7 @@ def add_note(tickets, ticket_id, author, message):
 
     existing_notes = ticket.get("notes", [])
 
-    if not isinstance(existing_notes, list):
-        raise ValueError("Existing ticket notes must be a list.")
-
-    # Validate existing notes and generate an ID before changing the ticket.
+    # Validate all existing notes and generate an ID before mutation.
     note_id = _generate_note_id(existing_notes)
 
     note = {
@@ -80,12 +99,14 @@ def add_note(tickets, ticket_id, author, message):
         "message": message,
     }
 
+    # Change the ticket only after validation succeeds.
     if "notes" not in ticket:
         ticket["notes"] = []
 
     ticket["notes"].append(note)
 
-    return note
+    # Return a copy so callers cannot mutate the stored note.
+    return deepcopy(note)
 
 
 def list_notes(tickets, ticket_id):
@@ -97,4 +118,5 @@ def list_notes(tickets, ticket_id):
     if not isinstance(notes, list):
         raise ValueError("Existing ticket notes must be a list.")
 
-    return list(notes)
+    # Copy the dictionaries as well as the outer list.
+    return deepcopy(notes)
