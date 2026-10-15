@@ -126,6 +126,13 @@ An author must be a nonblank string. A note message must be a string containing 
 Notes can be added only while a ticket is `open` or `in_progress`. A resolved ticket must be explicitly reopened before another note can be added.
 
 Validation occurs before the ticket is modified. Invalid submissions must not add a note or consume a note ID.
+**Safety and error handling**
+
+The notes module validates the ticket, author, message, and ticket status before adding a note. Notes can be added only to tickets with `open` or `in_progress` status. A resolved ticket must be explicitly reopened before another note can be added.
+
+The function should check existing note IDs before generating a new one. If validation fails, it should raise the agreed exception and leave the ticket's notes unchanged. Tests should verify both that the expected error is raised and that no partial change occurs.
+
+The notes module provides the business logic for adding and listing notes, while the command-line interface handles user input and displays the results. The function signature and error-handling convention should be agreed with Engineer B and documented consistently.
 
 ## 9. Persistence with JSON
 

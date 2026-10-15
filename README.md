@@ -1,270 +1,281 @@
-# CampusFlow – Campus Helpdesk Ticket Management System
+# CampusFlow Next – Campus Helpdesk Ticket Management System
 
 ## 1. About the Project
 
-CampusFlow is a Python project designed to help students and staff report problems on campus and make it easier for the right people to solve them.
+CampusFlow Next is a Python command-line application designed to help students and staff report campus problems and help support staff manage them until they are resolved.
 
-For example, a student may report a faulty computer in a laboratory, a network problem, or an electrical fault. CampusFlow is designed to record the problem as a ticket, calculate its priority, and help the responsible staff manage it until it is resolved.
+Examples include faulty laboratory computers, network failures, software problems, and electrical faults.
 
-### The Problem We Want to Solve
-
-Sometimes, campus problems are reported verbally or through informal messages. This can make it difficult to keep records, identify urgent problems, and know which issues have been resolved.
-
-We are building CampusFlow to provide a more organized way to report and manage these problems.
+The application records reported problems as tickets, calculates priority, supports staff assignment, tracks ticket status, stores follow-up notes, and saves ticket data using JSON.
 
 ## 2. Project Objectives
 
-The main objectives of CampusFlow are to:
+CampusFlow Next aims to:
 
-- Make it easier to record problems on campus.
-- Give every ticket an ID for easy identification.
+- Record campus problems in an organized way.
+- Generate unique ticket IDs.
 - Calculate ticket priority automatically.
-- Allow tickets to be assigned to staff.
-- Track the progress of reported problems.
-- Save ticket information for future reference.
-- Make it easier to test and maintain the application.
+- Assign tickets to responsible staff.
+- Track ticket status from open to resolved.
+- Maintain follow-up notes on eligible tickets.
+- Display an ordered queue of unresolved work.
+- Generate reports on ticket totals, statuses, and priorities.
+- Persist ticket records using JSON.
+- Use automated tests to improve reliability and maintainability.
 
 ## 3. Team Members and Responsibilities
 
-We are working together on CampusFlow, with each team member responsible for a different part of the project.
+### Engineer A: Blessing Anebi
 
-### Engineer A: Okoh Abah
-**Role: Ticket Creation and Priority Calculation**
+**Focus: Ticket creation and priority calculation**
 
-Responsibilities:
-- Creating new tickets.
-- Checking that the required information is valid.
+Responsibilities include:
+- Creating and validating tickets.
 - Generating ticket IDs.
-- Calculating ticket priority based on urgency and the number of affected users.
-- Writing automated tests for the ticket-creation functions.
+- Calculating ticket priority.
+- Writing and maintaining relevant automated tests.
 
-### Engineer B: Blessing Anebi
-**Role: Ticket Workflow and Data Management**
+### Engineer B: Philip Edward
 
-Responsibilities:
-- Managing ticket assignment.
-- Updating ticket status.
-- Working on saving and loading ticket records using JSON.
-- Testing the workflow and data-management functions.
+**Focus: Workflow and data management**
 
-The two engineers will work together to connect their modules and test the complete application.
+Responsibilities include:
+- Managing ticket assignment and status transitions.
+- Supporting JSON persistence.
+- Working on workflow and data-management tests.
+- Helping integrate and verify the application.
+
+Both engineers contribute to testing, documentation, code review, and integration.
 
 ## 4. Tools and Technologies
 
-We are using the following tools to build CampusFlow:
+- **Python 3:** Application development.
+- **Git:** Version control.
+- **GitHub:** Collaboration and pull-request reviews.
+- **unittest:** Automated testing.
+- **JSON:** Ticket data persistence.
 
-- **Python 3.12:** For writing the application.
-- **Git:** For tracking changes to our code.
-- **GitHub:** For sharing code and reviewing contributions.
-- **Python unittest:** For testing our functions.
-- **JSON:** The planned format for saving ticket records.
+The project uses Python's standard library for its core functionality.
 
 ## 5. Features
 
-The ticket-creation part of CampusFlow currently supports:
+The application includes the following functionality:
 
-- Creating a ticket with a title, category, urgency, and number of affected users.
-- Generating ticket IDs such as `T001` and `T002`.
-- Calculating ticket priority automatically.
-- Rejecting invalid ticket information.
-- Setting the initial ticket status to `open`.
-- Leaving the ticket unassigned until a staff member is assigned.
+- Ticket creation with a title, category, urgency, and number of affected users.
+- Automatic ticket ID generation, such as `T001`.
+- Automatic priority calculation.
+- Input validation.
+- Ticket listing and individual ticket viewing.
+- Staff assignment.
+- Status updates with workflow rules.
+- A work queue ordered by priority and ticket ID.
+- Reports showing ticket totals, statuses, and priorities.
+- Follow-up notes for eligible tickets.
+- JSON-based saving and loading of ticket records.
 
-The wider project is also intended to support ticket assignment, status updates, and data storage. These features must be integrated and tested before we can consider the complete application ready.
+Search and combined-filter functionality should be confirmed against the latest integrated code before being described as completed features.
 
-## 6. How to Set Up the Project
+## 6. Setup
 
 ### Requirements
 
 You need:
-- Python 3.12 or a compatible Python 3 version.
+- Python 3.
 - Git.
-- A terminal or an editor such as Visual Studio Code.
+- A terminal or code editor, such as Visual Studio Code.
 
-### Step 1: Clone the Repository
-
-Open your terminal and run:
+### Clone the repository
 
 ```bash
 git clone https://github.com/Oanebi/CampusFlow.git
 cd CampusFlow
 ```
 
-### Step 2: Create a Virtual Environment
+### Create a virtual environment
 
-On Linux or macOS, run:
+On Linux or macOS:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-On Windows, run:
+On Windows:
 
 ```powershell
 py -m venv .venv
 .venv\Scripts\activate
 ```
 
-A virtual environment helps keep the project's Python environment separate from other projects on your computer.
+No third-party packages are currently required for the core application.
 
 ## 7. Running the Application
 
-The ticket-creation functions are in:
+From the project root, run:
 
-`campusflow/tickets.py`
+```bash
+python3 main.py
+```
 
-The current ticket-creation module provides functions for creating tickets and calculating their priorities.
+The command-line menu provides options to:
 
-The command for launching the complete interactive application and its menu options should be added after the CLI has been integrated and tested.
+1. Create a ticket.
+2. List tickets.
+3. View a ticket.
+4. Assign a ticket.
+5. Update ticket status.
+6. View the work queue.
+7. View reports.
+8. Exit.
 
-The completed application is expected to let users create tickets, assign staff, update ticket status, and manage reported problems.
+Follow the prompts displayed by the application.
 
-## 8. How Ticket Priority Works
+## 8. Ticket Priority
 
-CampusFlow calculates priority using two things:
-
-1. The urgency of the problem.
-2. The number of people affected.
-
-The current rules are:
+Priority is calculated from the urgency of the problem and the number of affected users.
 
 | Condition | Priority |
 |---|---|
-| High urgency and 10 or more affected users | Critical |
-| High urgency or 10 or more affected users, when the critical rule does not apply | High |
-| Medium urgency or 3 or more affected users, when no higher rule applies | Medium |
-| All other valid cases | Low |
+| High urgency and at least 10 affected users | Critical |
+| High urgency or at least 10 affected users, unless critical applies | High |
+| Medium urgency or at least 3 affected users, unless a higher priority applies | Medium |
+| All other valid combinations | Low |
 
-The accepted urgency values are `low`, `medium`, and `high`.
+Accepted urgency values are `low`, `medium`, and `high`.
 
-For example, a high-urgency problem affecting 15 people receives a critical priority.
+For example, a high-urgency problem affecting 15 users receives critical priority.
 
-These rules help the system identify problems that may need more urgent attention.
+## 9. Ticket Workflow
 
-## 9. Ticket Status
+A newly created ticket starts with status `open` and no assigned staff member.
 
-When a ticket is created, its initial status is `open`.
+The workflow supports these statuses:
 
-This means the problem has been reported and is waiting for further action.
+- `open`
+- `in_progress`
+- `resolved`
 
-A new ticket also starts with no assigned staff member.
+A ticket must be assigned before it can move from `open` to `in_progress`. An in-progress ticket can be resolved. A resolved ticket must be explicitly reopened before further modification.
 
-The workflow part of the project is intended to manage assignments and status changes as work progresses. The final status rules will be documented after the workflow has been integrated and tested.
+These rules help prevent invalid status changes and accidental updates to resolved tickets.
 
-## 10. Running the Tests
+## 10. Follow-up Notes
 
-We use Python's built-in `unittest` framework to check that our functions work as expected.
+Tickets can contain follow-up notes recording additional information about a problem.
 
-The ticket-creation tests are in:
+Each note includes:
+- A note ID, such as `N001`.
+- The author's name.
+- A message.
 
-`tests/test_tickets.py`
+Notes are limited to eligible tickets, and their author and message are validated. Note IDs are generated independently for each ticket.
 
-They check:
-- Ticket priority calculation.
-- Ticket creation.
-- Ticket ID generation.
-- Invalid urgency values.
-- Invalid numbers of affected users.
-- Empty or invalid titles and categories.
-- Other invalid input.
+## 11. Work Queue and Reports
 
-To run the tests, open a terminal in the project folder and enter:
+The work queue displays open tickets in priority order:
+
+1. Critical
+2. High
+3. Medium
+4. Low
+
+Tickets with the same priority are ordered by numeric ticket ID.
+
+The reports functionality summarizes ticket totals, ticket statuses, and priority counts. Reports should also handle the case where no tickets exist.
+
+## 12. JSON Storage
+
+CampusFlow Next uses JSON to persist ticket data.
+
+The default storage path is:
+
+`data/tickets.json`
+
+The storage module provides functions to save and load ticket records. A missing data file starts with an empty ticket list, while invalid JSON or invalid ticket data should produce a clear error.
+
+Ticket records can include follow-up notes. The application should be tested to confirm that tickets and their notes survive a save-and-reload cycle.
+
+The JSON file contains application data, not Python source code.
+
+## 13. Running the Tests
+
+CampusFlow Next uses Python's built-in `unittest` framework.
+
+Run the complete test suite from the project root:
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-The ticket-creation module currently has **17 automated tests**, and all 17 passed after the changes were merged into the `main` branch.
+To run an individual test file:
 
-Tests for the workflow, JSON storage, and the complete ticket process should also be run when those parts are integrated.
+```bash
+python3 -m unittest discover -s tests -p "test_tickets.py" -v
+```
 
-## 11. Saving Ticket Information
+The tests cover ticket creation, priority calculation, workflow rules, reports, storage, and notes.
 
-We plan to use JSON to save ticket information because it is easy to read and Python supports it.
+During development, the full suite passed **67 tests**. Re-run it against the latest integrated `main` branch before submitting the project, and update this result if the test count or outcome changes.
 
-The current ticket-creation function returns a Python dictionary. It does not save tickets to a file by itself.
+## 14. Project Structure
 
-The team still needs to verify the final storage filename and location after the JSON functionality has been integrated.
-
-Once storage is available, this section should explain how to save tickets, load existing tickets, and start with an empty set of records when needed.
-
-## 12. Project Structure
-
-The main files in the merged ticket-creation contribution are:
+The project includes the following main files:
 
 ```text
 CampusFlow/
 ├── campusflow/
-│   └── tickets.py
+│   ├── __init__.py
+│   ├── tickets.py
+│   ├── workflow.py
+│   ├── storage.py
+│   ├── reports.py
+│   └── notes.py
 ├── tests/
-│   └── test_tickets.py
+│   ├── test_tickets.py
+│   ├── test_workflow.py
+│   ├── test_storage.py
+│   ├── test_reports.py
+│   └── test_notes.py
 ├── docs/
+│   ├── baseline-check.md
+│   ├── design-decisions.md
 │   └── ai-learning-log.md
+├── data/
+├── main.py
 ├── README.md
 └── .gitignore
 ```
 
-Other files, including workflow and data-storage components, are part of the wider project and may be added as development continues.
+This describes the intended project layout. Confirm the actual files in the repository before treating the tree as exhaustive.
 
-## 13. Current Limitations
+## 15. Known Limitations and Verification
 
-Some parts of CampusFlow still need to be completed or verified.
+Before final submission, the team must verify:
 
-These include:
-- Connecting all the modules into one working application.
-- Completing and testing the interactive command-line menu.
-- Verifying ticket assignment and status updates.
-- Implementing and testing JSON storage.
-- Testing the complete process from ticket creation to resolution.
+- Search and combined filters, if required by the final specification.
+- Correct behavior when invalid data is supplied.
+- Safe handling of failed saves and malformed JSON.
+- Correct save-and-reload behavior for tickets and notes.
+- The complete CLI demonstration on the latest integrated `main` branch.
 
-The current ticket ID generator also depends on the list of existing tickets supplied to it. The complete application must manage saved tickets correctly to avoid duplicate IDs.
+Any unresolved failures or incomplete features must be documented honestly.
 
-We will continue working on these areas as a team.
+## 16. GitHub Workflow
 
-## 14. Future Improvements
+The team uses feature branches and pull requests to review changes before merging them into `main`.
 
-Some improvements we would like to make include:
-
-- Completing the interactive menu.
-- Connecting ticket creation with workflow management.
-- Saving and loading tickets from JSON.
-- Searching for tickets.
-- Generating reports on ticket priorities and status.
-- Improving error messages.
-- Adding more tests for the complete application.
-
-These improvements will depend on the project's requirements and the time available.
-
-## 15. Pull Requests and Contributions
-
-We use GitHub to share our work and review changes before merging them into the main branch.
-
-### Engineer A: Okoh Abah
-
-Ticket creation and priority calculation:
-
-[View Engineer A's pull request](https://github.com/Oanebi/CampusFlow/pull/1)
-
-### Engineer B: Blessing Anebi
-
-To find Engineer B's contribution and review status, visit:
-
-[View CampusFlow pull requests on GitHub](https://github.com/Oanebi/CampusFlow/pulls)
-
-## 16. Working on the Project
-
-Our basic development process is:
+The normal workflow is:
 
 1. Update the local `main` branch.
-2. Create a branch for the feature being developed.
-3. Write the code and tests.
-4. Run the tests.
-5. Commit and push the changes.
-6. Open a pull request for review.
-7. Merge the changes when they are ready.
+2. Create a feature branch.
+3. Implement the change and add tests.
+4. Run the relevant tests and full test suite.
+5. Commit and push the branch.
+6. Open a pull request.
+7. Request and complete peer review.
+8. Merge after required approval.
 
-For example:
+Example:
 
 ```bash
 git switch main
@@ -272,18 +283,33 @@ git pull origin main
 git switch -c feature/your-feature
 ```
 
-After making and testing changes:
+After making changes:
 
 ```bash
-git add .
+git add path/to/changed-files
 git commit -m "feat: describe your change"
 git push -u origin feature/your-feature
 ```
 
-The team can then open a pull request on GitHub.
+Feature work should not be committed directly to `main`. Each engineer should review the other engineer's pull request and address blocking feedback before merging.
 
-## 17. Conclusion
+## 17. Project Documentation and Learning Evidence
 
-CampusFlow is our attempt to make reporting and managing campus problems more organized.
+The `docs/` directory records the project's development and engineering decisions.
 
-We have completed and tested the ticket-creation part, including ticket ID generation, input validation, and automatic priority calculation. Our next step is to connect it with the workflow and storage features so that the complete application can manage tickets from the time they are reported until they are resolved.
+- `baseline-check.md` documents the initial application state, environment, commands, representative inputs, and observed results.
+- `design-decisions.md` records function contracts, data structures, validation rules, and module responsibilities.
+- `ai-learning-log.md` records genuine learning questions, experiments, independent verification, results, and critical evaluations of AI suggestions.
+
+These documents should reflect actual work performed by both engineers.
+
+## 18. Final Verification and Submission
+
+Before submission, the team will:
+
+- Run the full test suite on the latest integrated `main` branch.
+- Demonstrate the required ticket creation, workflow, queue, reports, notes, search, and persistence behavior.
+- Confirm both engineers' contributions and pull-request reviews.
+- Record the repository URL, pull-request links, test results, both engineers' names, and final `main` commit SHA.
+
+CampusFlow Next aims to make campus helpdesk work more organized, traceable, and testable through a simple Python application.
