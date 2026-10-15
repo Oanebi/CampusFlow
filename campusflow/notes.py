@@ -1,12 +1,13 @@
 
 """Functions for adding and retrieving ticket follow-up notes."""
 
+from copy import deepcopy
+
 from campusflow.workflow import find_ticket
 
 
 def _generate_note_id(notes):
     """Return the next available note ID for a ticket."""
-
     existing_ids = set()
 
     for note in notes:
@@ -23,7 +24,6 @@ def _generate_note_id(notes):
         if not number_part.isdigit() or int(number_part) < 1:
             raise ValueError("Existing note ID is invalid.")
 
-        # Require a consistent format, such as N001 or N012.
         if note_id != f"N{int(number_part):03d}":
             raise ValueError("Existing note ID format is invalid.")
 
@@ -44,7 +44,6 @@ def _generate_note_id(notes):
 
 def add_note(tickets, ticket_id, author, message):
     """Validate and add a follow-up note to an eligible ticket."""
-
     ticket = find_ticket(tickets, ticket_id)
 
     if not isinstance(author, str) or not author.strip():
@@ -71,7 +70,6 @@ def add_note(tickets, ticket_id, author, message):
     if not isinstance(existing_notes, list):
         raise ValueError("Existing ticket notes must be a list.")
 
-    # Validate existing notes and generate an ID before changing the ticket.
     note_id = _generate_note_id(existing_notes)
 
     note = {
@@ -85,16 +83,15 @@ def add_note(tickets, ticket_id, author, message):
 
     ticket["notes"].append(note)
 
-    return note
+    return deepcopy(note)
 
 
 def list_notes(tickets, ticket_id):
     """Return a copy of a ticket's notes without changing the ticket."""
-
     ticket = find_ticket(tickets, ticket_id)
     notes = ticket.get("notes", [])
 
     if not isinstance(notes, list):
         raise ValueError("Existing ticket notes must be a list.")
 
-    return list(notes)
+    return deepcopy(notes)
